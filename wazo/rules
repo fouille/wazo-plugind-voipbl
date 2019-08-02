@@ -1,0 +1,32 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0+
+
+
+case "$1" in
+    build)
+        ;;
+
+    package)
+        cp -R etc ${pkgdir}/
+        cp -R usr ${pkgdir}/
+        ;;
+
+    install)
+        systemctl restart fail2ban
+        # populate blacklist the first time
+        /usr/local/bin/voipbl
+        ;;
+
+    uninstall)
+        # check you have the same name on the script voipbl
+        /sbin/iptables -F voipbl-blacklist
+        /sbin/iptables -D INPUT -j voipbl-blacklist
+        /sbin/iptables -X voipbl-blacklist
+        systemctl restart fail2ban
+        ;;
+
+    *)
+        echo "$0 called with unknown argument '$1'" >&2
+        exit 1
+    ;;
+esac

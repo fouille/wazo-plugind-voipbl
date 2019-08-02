@@ -1,0 +1,9 @@
+name: voipbl
+namespace: scopserv
+version: 0.0.1
+author: Sylvain Boily
+display_name: VOIP black list
+tags:
+  - beta
+  - security
+homepage: http://voipbl.org
