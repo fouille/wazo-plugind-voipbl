@@ -7,6 +7,9 @@ Add Actual parameters VOIPBL
 <code>
 crontab -e
 </code>
+
+<br>
+Insert this :<br>
 <code>
 0 */4 * * * /usr/local/bin/voipbl.sh > /var/log/voipbl.log 2>&1 
 </code>
