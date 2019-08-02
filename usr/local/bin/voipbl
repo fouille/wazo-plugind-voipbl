@@ -1,12 +1,27 @@
 #!/bin/bash
+NOW=$(date +"%d-%m-%Y %H:%M:%S")
 
 # Check if chain exists and create one if required
-if [ `iptables -L | grep -c "Chain voipbl-blacklist"` -lt 1 ]; then
+echo "UPDATE START at $NOW"
+echo " 1/4 -> Count VoIP BL in Iptable Rules..."
+if [ `/sbin/iptables -L voipbl-blacklist -n | grep -c "DROP"` -lt 1 ]; then
+  echo "   -> Create first rules in IPtables"
   /sbin/iptables -N voipbl-blacklist
   /sbin/iptables -I INPUT 1 -j voipbl-blacklist
 fi
-	
+
 # Empty the chain
+URL="http://www.voipbl.org/update/"
+
+set -e
+echo " 2/4 -> Downloading rules from VoIP Blacklist..."
+wget -qO - $URL -O /tmp/voipbl.txt
+
+echo " 3/4 -> Loading rules..."
+
+echo " 4/4 -> Flush and Add new VOIPBL..."
 /sbin/iptables -F voipbl-blacklist
-wget -qO - http://www.voipbl.org/update/ |\
+cat /tmp/voipbl.txt |\
   awk '{print "if [ ! -z \""$1"\" -a \""$1"\" !=  \"#\" ]; then /sbin/iptables -A voipbl-blacklist -s \""$1"\" -j DROP;fi;"}' | sh
+
+echo "UPDATE DONE at $NOW"
